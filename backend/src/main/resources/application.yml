@@ -1,0 +1,34 @@
+spring:
+  r2dbc:
+    url: r2dbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:gpuoj}
+    username: ${DB_USER:gpuoj}
+    password: ${DB_PASS:gpuoj}
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:schema.sql
+
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP:localhost:9092}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+    consumer:
+      group-id: backend-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+
+app:
+  jwt:
+    secret: ${JWT_SECRET:change-me-in-production-32-chars-min!!}
+    expiry-ms: 86400000   # 24h
+  kafka:
+    jobs-topic: gpu-jobs
+    results-topic: gpu-results
+  problems:
+    git-repo-url: ${PROBLEMS_GIT_URL:}
+    local-path: ${PROBLEMS_LOCAL_PATH:/problems}
+
+server:
+  port: 8080

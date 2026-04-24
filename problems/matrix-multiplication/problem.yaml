@@ -1,0 +1,7 @@
+id: matrix-multiplication
+title: "Parallel Matrix Multiplication"
+difficulty: MEDIUM
+judge_type: speedup
+time_limit_ms: 5000
+vram_limit_mb: 2048
+speedup_threshold: 10.0

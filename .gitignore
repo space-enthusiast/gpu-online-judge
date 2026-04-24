@@ -1,0 +1,22 @@
+# Backend
+backend/build/
+backend/.gradle/
+*.jar
+
+# Frontend
+frontend/node_modules/
+frontend/dist/
+
+# Worker
+worker/__pycache__/
+worker/judge/__pycache__/
+*.pyc
+
+# Local env
+.env
+*.env
+
+# IDE
+.idea/
+.vscode/
+*.iml

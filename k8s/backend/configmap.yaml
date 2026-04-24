@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: backend-config
+  namespace: gpu-oj
+data:
+  DB_HOST: postgres.gpu-oj.svc.cluster.local
+  DB_PORT: "5432"
+  DB_NAME: gpuoj
+  DB_USER: gpuoj
+  KAFKA_BOOTSTRAP: kafka.gpu-oj.svc.cluster.local:9092
+  PROBLEMS_LOCAL_PATH: /problems

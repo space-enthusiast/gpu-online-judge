@@ -1,0 +1,28 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: kafka
+  namespace: gpu-oj
+spec:
+  selector:
+    app: kafka
+  ports:
+    - name: internal
+      port: 9092
+      targetPort: 9092
+  clusterIP: None
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kafka-external
+  namespace: gpu-oj
+spec:
+  type: NodePort
+  selector:
+    app: kafka
+  ports:
+    - name: external
+      port: 9093
+      targetPort: 9093
+      nodePort: 30092
