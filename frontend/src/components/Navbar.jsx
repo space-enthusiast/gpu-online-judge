@@ -17,6 +17,9 @@ export default function Navbar() {
         GPU-OJ
       </Link>
       <Link to="/problems" style={{ color: '#cdd6f4', textDecoration: 'none', marginLeft: '1rem' }}>Problems</Link>
+      {localStorage.getItem('token') && (
+        <Link to="/submissions" style={{ color: '#cdd6f4', textDecoration: 'none' }}>My Submissions</Link>
+      )}
       <span style={{ flex: 1 }} />
       {token ? (
         <>

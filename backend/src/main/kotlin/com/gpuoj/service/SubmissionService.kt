@@ -65,6 +65,15 @@ class SubmissionService(
             }
     }
 
+    fun listMySubmissions(): Flux<Submission> {
+        return ReactiveSecurityContextHolder.getContext()
+            .map { it.authentication.name }
+            .flatMapMany { username ->
+                userRepo.findByUsername(username)
+                    .flatMapMany { user -> submissionRepo.findByUserIdOrderBySubmittedAtDesc(user.id!!) }
+            }
+    }
+
     fun getSubmission(id: UUID): Mono<Submission> =
         submissionRepo.findById(id)
             .switchIfEmpty(Mono.error(ResponseStatusException(HttpStatus.NOT_FOUND)))

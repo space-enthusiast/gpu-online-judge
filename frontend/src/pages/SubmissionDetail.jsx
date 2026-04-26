@@ -13,17 +13,30 @@ export default function SubmissionDetail() {
   const [verdict, setVerdict] = useState(null)
 
   useEffect(() => {
-    submissions.get(id).then(r => setSub(r.data))
-
-    const es = submissions.streamStatus(id)
-    es.onmessage = (e) => {
-      const data = JSON.parse(e.data)
-      setVerdict(data)
-      setSub(prev => prev ? { ...prev, ...data, status: data.verdict } : null)
-      es.close()
-    }
-    es.onerror = () => es.close()
-    return () => es.close()
+    submissions.get(id).then(r => {
+      const data = r.data
+      setSub(data)
+      if (data.status !== 'PENDING' && data.status !== 'JUDGING') {
+        setVerdict({
+          verdict: data.verdict,
+          stdout: data.stdout,
+          stderr: data.stderr,
+          wallTimeMs: data.wallTimeMs,
+          peakVramMb: data.peakVramMb,
+          speedup: data.speedup,
+        })
+        return
+      }
+      const token = localStorage.getItem('token')
+      const es = submissions.streamStatus(id, token)
+      es.onmessage = (e) => {
+        const result = JSON.parse(e.data)
+        setVerdict(result)
+        setSub(prev => prev ? { ...prev, ...result, status: result.verdict } : null)
+        es.close()
+      }
+      es.onerror = () => es.close()
+    })
   }, [id])
 
   if (!sub) return <p>Loading...</p>

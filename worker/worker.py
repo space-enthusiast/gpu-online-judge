@@ -22,6 +22,8 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(mess
 log = logging.getLogger(__name__)
 
 SANDBOX_IMAGE = "cuda-sandbox:latest"
+SHARED_TMP = "/tmp/gpuoj"
+os.makedirs(SHARED_TMP, exist_ok=True)
 
 
 def parse_args():
@@ -50,7 +52,7 @@ def create_producer(bootstrap):
 
 def run_sandbox(docker_client, submission_id, source_cu, input_path, time_limit_s):
     """Compile and run CUDA solution in isolated container. Returns (stdout, stderr, exit_code, wall_ms)."""
-    workdir = tempfile.mkdtemp(prefix=f"gpuoj_{submission_id}_")
+    workdir = tempfile.mkdtemp(prefix=f"gpuoj_{submission_id}_", dir=SHARED_TMP)
     try:
         sol_cu = os.path.join(workdir, "solution.cu")
         with open(sol_cu, "w") as f:

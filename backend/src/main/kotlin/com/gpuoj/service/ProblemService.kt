@@ -5,6 +5,7 @@ import com.gpuoj.repository.ProblemRepository
 import org.eclipse.jgit.api.Git
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.data.r2dbc.core.R2dbcEntityTemplate
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import org.springframework.web.server.ResponseStatusException
@@ -19,7 +20,10 @@ import java.nio.file.Path
 import java.time.OffsetDateTime
 
 @Service
-class ProblemService(private val problemRepo: ProblemRepository) {
+class ProblemService(
+    private val problemRepo: ProblemRepository,
+    private val template: R2dbcEntityTemplate
+) {
     private val log = LoggerFactory.getLogger(javaClass)
 
     @Value("\${app.problems.git-repo-url:}")
@@ -28,7 +32,7 @@ class ProblemService(private val problemRepo: ProblemRepository) {
     @Value("\${app.problems.local-path}")
     private lateinit var localProblemsPath: String
 
-    fun listProblems(): Flux<Problem> = problemRepo.findAll()
+    fun listProblems(): Flux<Problem> = problemRepo.findAllOrdered()
 
     fun getProblem(id: String): Mono<Problem> =
         problemRepo.findById(id)
@@ -87,7 +91,12 @@ class ProblemService(private val problemRepo: ProblemRepository) {
                         speedupThreshold = (data["speedup_threshold"] as? Number)?.toDouble(),
                         syncedAt = OffsetDateTime.now()
                     )
-                    problemRepo.save(problem).block()
+                    val exists = problemRepo.existsById(problem.id!!).block() ?: false
+                    if (exists) {
+                        problemRepo.save(problem).block()
+                    } else {
+                        template.insert(problem).block()
+                    }
                     count++
                 }
             } catch (e: Exception) {

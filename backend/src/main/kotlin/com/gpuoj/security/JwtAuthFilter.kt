@@ -14,19 +14,22 @@ import reactor.core.publisher.Mono
 class JwtAuthFilter(private val jwtUtil: JwtUtil) : WebFilter {
 
     override fun filter(exchange: ServerWebExchange, chain: WebFilterChain): Mono<Void> {
-        val header = exchange.request.headers.getFirst(HttpHeaders.AUTHORIZATION)
-        if (header != null && header.startsWith("Bearer ")) {
-            val token = header.substring(7)
-            if (jwtUtil.isValid(token)) {
-                val username = jwtUtil.getUsername(token)
-                val role = jwtUtil.getRole(token)
-                val auth = UsernamePasswordAuthenticationToken(
-                    username, null, listOf(SimpleGrantedAuthority("ROLE_$role"))
-                )
-                return chain.filter(exchange)
-                    .contextWrite(ReactiveSecurityContextHolder.withAuthentication(auth))
-            }
+        val token = resolveToken(exchange)
+        if (token != null && jwtUtil.isValid(token)) {
+            val username = jwtUtil.getUsername(token)
+            val role = jwtUtil.getRole(token)
+            val auth = UsernamePasswordAuthenticationToken(
+                username, null, listOf(SimpleGrantedAuthority("ROLE_$role"))
+            )
+            return chain.filter(exchange)
+                .contextWrite(ReactiveSecurityContextHolder.withAuthentication(auth))
         }
         return chain.filter(exchange)
+    }
+
+    private fun resolveToken(exchange: ServerWebExchange): String? {
+        val header = exchange.request.headers.getFirst(HttpHeaders.AUTHORIZATION)
+        if (header != null && header.startsWith("Bearer ")) return header.substring(7)
+        return exchange.request.queryParams.getFirst("token")
     }
 }

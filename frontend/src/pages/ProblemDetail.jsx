@@ -30,8 +30,6 @@ export default function ProblemDetail() {
   }, [id])
 
   async function handleSubmit() {
-    const token = localStorage.getItem('token')
-    if (!token) { navigate('/login'); return }
     setSubmitting(true)
     setError(null)
     try {

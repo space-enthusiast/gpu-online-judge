@@ -23,6 +23,9 @@ class SubmissionController(private val submissionService: SubmissionService) {
     @PostMapping
     fun submit(@RequestBody req: SubmissionRequest): Mono<Submission> = submissionService.submit(req)
 
+    @GetMapping
+    fun listMySubmissions(): Flux<Submission> = submissionService.listMySubmissions()
+
     @GetMapping("/{id}")
     fun getSubmission(@PathVariable id: UUID): Mono<Submission> = submissionService.getSubmission(id)
 

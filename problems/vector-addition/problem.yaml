@@ -1,0 +1,6 @@
+id: vector-addition
+title: "Vector Addition"
+difficulty: EASY
+judge_type: correctness
+time_limit_ms: 3000
+vram_limit_mb: 512
