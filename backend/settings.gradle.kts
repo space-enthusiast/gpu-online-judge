@@ -1,1 +1,1 @@
-rootProject.name = "gpu-oj-backend"
+rootProject.name = "helios-api"
